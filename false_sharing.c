@@ -53,8 +53,9 @@ int get_num_phys_cores()
         }
         else
         {
-                perror("Error trying to read /sys/devices/system/cpu/smt/active\n");
-                exit(-1);
+                smt_enabled = 0;
+                phys_cores = num_cores;
+                printf("Debug: /sys/devices/system/cpu/smt/active doesn't exit\n");
         }
         return phys_cores;
 }
@@ -71,7 +72,7 @@ int *get_thread_siblings(int nphys_cores)
         unsigned int size = 1;
         unsigned short index = 0;
         
-        fptr = popen("grep -H . /sys/devices/system/cpu/cpu*/topology/thread_siblings_list | sort -n -t ':' -k 2 -u | grep -Eo '[0-9],[0-9]+(,[0-9])*'", "r");
+        fptr = popen("grep -H . /sys/devices/system/cpu/cpu*/topology/thread_siblings_list | sort -n -t ':' -k 2 -u | grep -Eo '[0-9]((,|-)[0-9]|\\S)+((,|-)[0-9])*'", "r");
 
         if(fptr)
         {
